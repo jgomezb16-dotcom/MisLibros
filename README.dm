@@ -37,3 +37,7 @@ También le pone el id a cada uno.
 
 Representar un solo libro. Guarda sus datos y los protege con private, y tiene
 obtenerFicha() para armar el texto que se muestra.
+
+## Captura
+
+Las capturas de la aplicación funcionando están en el archivo capturas.pdf
