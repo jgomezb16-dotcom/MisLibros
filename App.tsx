@@ -4,8 +4,6 @@ import { LibroService } from "./src/services/LibroService";
 import { Libro } from "./src/models/Libro";
 
 const servicio = new LibroService();
-servicio.agregar("Cien años de soledad", "Gabriel García Márquez", 1967);
-servicio.agregar("El señor Presidente", "Miguel Ángel Asturias", 1946);
 
 export default function App() {
   const [libros, setLibros] = useState<Libro[]>(servicio.listar());
