@@ -1,14 +1,15 @@
+import { supabase } from "../lib/supabase";
 import { Libro } from "../models/Libro";
+
+interface FilaLibro {
+  id: number;
+  titulo: string;
+  autor: string;
+  anio: number;
+}
 
 export class LibroRepository {
   private static instancia: LibroRepository;
-
-  // Fuente de datos simulada (mock)
-  private libros: Libro[] = [
-    new Libro("libro-1", "Cien años de soledad", "Gabriel García Márquez", 1967),
-    new Libro("libro-2", "El señor Presidente", "Miguel Ángel Asturias", 1946),
-  ];
-  private contador: number = 2;
 
   private constructor() {}
 
@@ -19,29 +20,46 @@ export class LibroRepository {
     return LibroRepository.instancia;
   }
 
-  public obtenerLibros(): Libro[] {
-    return [...this.libros];
+  // Convierte una fila de Supabase en un objeto Libro
+  private aLibro(fila: FilaLibro): Libro {
+    return new Libro(String(fila.id), fila.titulo, fila.autor, fila.anio);
   }
 
-  public agregarLibro(titulo: string, autor: string, anio: number): Libro[] {
-    this.contador = this.contador + 1;
-    const id = "libro-" + this.contador;
+  public async obtenerLibros(): Promise<Libro[]> {
+    const { data, error } = await supabase
+      .from("libros")
+      .select("id, titulo, autor, anio")
+      .order("id", { ascending: true });
 
-    const nuevo = new Libro(id, titulo, autor, anio);
-    this.libros = [...this.libros, nuevo];
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return (data as FilaLibro[]).map((fila) => this.aLibro(fila));
+  }
+
+  public async agregarLibro(titulo: string, autor: string, anio: number): Promise<Libro[]> {
+    const { error } = await supabase
+      .from("libros")
+      .insert({ titulo, autor, anio });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
     return this.obtenerLibros();
   }
 
-  public eliminarLibro(id: string): Libro[] {
-    const restantes: Libro[] = [];
+  public async eliminarLibro(id: string): Promise<Libro[]> {
+    const { error } = await supabase
+      .from("libros")
+      .delete()
+      .eq("id", Number(id));
 
-    for (const libro of this.libros) {
-      if (libro.obtenerId() !== id) {
-        restantes.push(libro);
-      }
+    if (error) {
+      throw new Error(error.message);
     }
 
-    this.libros = restantes;
     return this.obtenerLibros();
   }
 }

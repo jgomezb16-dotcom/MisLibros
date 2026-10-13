@@ -11,11 +11,11 @@ export class LibroService {
     console.log("Prueba Singleton - ¿Es la misma instancia?", instancia1 === instancia2);
   }
 
-  public listar(): Libro[] {
+  public async listar(): Promise<Libro[]> {
     return this.repositorio.obtenerLibros();
   }
 
-  public agregar(titulo: string, autor: string, anio: number): boolean {
+  public async agregar(titulo: string, autor: string, anio: number): Promise<boolean> {
     if (titulo.trim() === "") {
       return false;
     }
@@ -26,15 +26,16 @@ export class LibroService {
       return false;
     }
 
-    this.repositorio.agregarLibro(titulo.trim(), autor.trim(), anio);
+    await this.repositorio.agregarLibro(titulo.trim(), autor.trim(), anio);
     return true;
   }
 
-  public eliminar(id: string): void {
-    this.repositorio.eliminarLibro(id);
+  public async eliminar(id: string): Promise<void> {
+    await this.repositorio.eliminarLibro(id);
   }
 
-  public total(): number {
-    return this.repositorio.obtenerLibros().length;
+  public async total(): Promise<number> {
+    const libros = await this.repositorio.obtenerLibros();
+    return libros.length;
   }
 }
